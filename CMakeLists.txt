@@ -92,6 +92,10 @@ ADD_TEST(EuclideanDistanceAndVectorDistanceTransform euclideanDistanceAndVectorD
 ADD_TEST(EuclideanDistanceAndVectorDistanceTransformCompareDistance ${IMAGE_COMPARE} euclideanDistanceAndVectorDistanceTransform-distance.img ${INPUT_IMAGE}/euclideanDistanceTransform.img)
 ADD_TEST(EuclideanDistanceAndVectorDistanceTransformCompareVector ${IMAGE_COMPARE} euclideanDistanceAndVectorDistanceTransform-vector.nrrd ${INPUT_IMAGE}/euclideanDistanceAndVectorDistanceTransform-vector.nrrd)
 
+ADD_TEST(EuclideanDistanceAndVoronoiTransform euclideanDistanceAndVoronoiTransform ${INPUT_IMAGE}/threeVoxels.label.img euclideanDistanceAndVoronoiTransform-distance.img euclideanDistanceAndVoronoiTransform-label.img)
+ADD_TEST(EuclideanDistanceAndVoronoiTransformCompareDistance ${IMAGE_COMPARE} euclideanDistanceAndVoronoiTransform-distance.img ${INPUT_IMAGE}/euclideanDistanceTransform.img)
+ADD_TEST(EuclideanDistanceAndVoronoiTransformCompareLabel ${IMAGE_COMPARE} euclideanDistanceAndVoronoiTransform-label.img ${INPUT_IMAGE}/euclideanDistanceAndVoronoiTransform-label.img)
+
 ADD_TEST(UnionOfSpheres unionOfSpheres ${INPUT_IMAGE}/threeVoxels.radius.img ${INPUT_IMAGE}/threeVoxels.label.img unionOfSpheres-union.img unionOfSpheres-voronoi.img)
 ADD_TEST(UnionOfSpheresCompareUnion ${IMAGE_COMPARE} unionOfSpheres-union.img ${INPUT_IMAGE}/unionOfSpheres-union.img)
 ADD_TEST(UnionOfSpheresCompareVoronoi ${IMAGE_COMPARE} unionOfSpheres-voronoi.img ${INPUT_IMAGE}/unionOfSpheres-voronoi.img)
