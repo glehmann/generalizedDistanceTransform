@@ -190,6 +190,7 @@ protected:
   /** Compute distance transform and optionally the voronoi map as well. */
   void GenerateData();  
 
+  template < bool UseSpacing, bool CreateVoronoiMap >  void TemplateGenerateData();
 
 private:   
   GeneralizedDistanceTransformImageFilter(const Self&); //purposely not implemented

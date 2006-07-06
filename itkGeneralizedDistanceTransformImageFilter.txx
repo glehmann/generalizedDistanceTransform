@@ -173,23 +173,23 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
   }
 }
 
-
-/**
- *  Compute Distance and Voronoi maps
- *  \todo Support progress methods/callbacks.
- */
 template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
+template <bool UseSpacing, bool CreateVoronoiMap >
 void 
 GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
-::GenerateData() 
+::TemplateGenerateData() 
 {
-
   this->PrepareData();
 
   // We need the size and probably the spacing of the images.
   DistanceImagePointer distance = this->GetDistance();
   typename DistanceImageType::SpacingType spacing = distance->GetSpacing();
   typename DistanceImageType::SizeType size = distance->GetRequestedRegion().GetSize();
+
+  typedef itk::LowerEnvelopeOfParabolas<UseSpacing, TSpacingType, MinimalSpacingPrecision,
+          CreateVoronoiMap, typename TLabelImage::PixelType,
+          typename TFunctionImage::IndexValueType,
+          typename TFunctionImage::PixelType> LEOP;
 
   // The distance image has been initialized to contain the function values
   // f(x) at x = (x1 x2 ... xN).
@@ -212,10 +212,10 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
   // disabled and should be optimized away.
   //
   // A cleaner solution would be specializations of GenerateData() on
-  // m_CreateVoronoiMap and m_UseSpacing.
+  // CreateVoronoiMap and UseSpacing.
   typedef itk::ImageLinearIteratorWithIndex<LabelImageType> LIt;
   LIt voronoiMapIt;
-  if (m_CreateVoronoiMap)
+  if (CreateVoronoiMap)
   {
     LabelImagePointer voronoiMap = 
       dynamic_cast<LabelImageType *>(this->ProcessObject::GetOutput(1));
@@ -231,154 +231,89 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
   // \todo non-local memory access for dimensions >= 1 can lead to ineffective
   // use of the cache. Another layout could improve performance.
 
+  for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+  {
+    distanceIt.SetDirection(d);
+    distanceIt.GoToBegin();
+
+    if (CreateVoronoiMap)
+    {
+      voronoiMapIt.SetDirection(d);
+      voronoiMapIt.GoToBegin();
+    }
+
+    while (!distanceIt.IsAtEnd())
+    {
+      // Compute the generalized distance transform for the current scanline
+
+      // First compute the lower envelope of parabolas
+      // The spacing is ignored by LEOP if UseSpacing == false. We provide a
+      // dummy value of 1 anyway.
+      LEOP envelope(size[d], UseSpacing ? static_cast<TSpacingType>(spacing[d]) : 1);
+
+      while (!distanceIt.IsAtEndOfLine())
+      {
+        typename LEOP::AbscissaIndexType i = distanceIt.GetIndex()[d];
+
+        if (CreateVoronoiMap)
+        {
+          envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
+          ++voronoiMapIt;
+          ++distanceIt;
+        }
+        else
+        {
+          envelope.addParabola(i, distanceIt.Value());
+          ++distanceIt;
+        }
+      }
+
+      // And now evaluate the lower envelope for the whole scanline
+      distanceIt.GoToBeginOfLine();
+      if (CreateVoronoiMap)
+        voronoiMapIt.GoToBeginOfLine();
+
+      if (CreateVoronoiMap)
+      {
+        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt, voronoiMapIt);
+        voronoiMapIt.NextLine();
+        distanceIt.NextLine();
+      }
+      else
+      {
+        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt);
+        distanceIt.NextLine();
+      }
+    }
+  }
+}
+
+/**
+ *  Compute Distance and Voronoi maps
+ *  \todo Support progress methods/callbacks.
+ */
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
+void 
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
+::GenerateData() 
+{
+  
   if( m_UseSpacing && m_CreateVoronoiMap )
     {
-    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    TemplateGenerateData<true, true>(); 
+    }
+  else if( m_UseSpacing && !m_CreateVoronoiMap )
     {
-      distanceIt.SetDirection(d);
-      distanceIt.GoToBegin();
-  
-      voronoiMapIt.SetDirection(d);
-      voronoiMapIt.GoToBegin();
-  
-      while (!distanceIt.IsAtEnd())
-      {
-        // Compute the generalized distance transform for the current scanline
-  
-        // First compute the lower envelope of parabolas
-        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
-        // dummy value of 1 anyway.
-        LEOPDV envelope(size[d], static_cast<TSpacingType>(spacing[d]));
-  
-        while (!distanceIt.IsAtEndOfLine())
-        {
-          typename LEOPDV::AbscissaIndexType i = distanceIt.GetIndex()[d];
-  
-          envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
-          ++voronoiMapIt;
-          ++distanceIt;
-        }
-  
-        // And now evaluate the lower envelope for the whole scanline
-        distanceIt.GoToBeginOfLine();
-        voronoiMapIt.GoToBeginOfLine();
-  
-        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt, voronoiMapIt);
-        voronoiMapIt.NextLine();
-        distanceIt.NextLine();
-      }
+    TemplateGenerateData<true, false>();
     }
-    }
-
-
-  if( m_UseSpacing && !m_CreateVoronoiMap )
+  else if( !m_UseSpacing && m_CreateVoronoiMap )
     {
-    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    TemplateGenerateData<false, true>();
+    }
+  else if( !m_UseSpacing && !m_CreateVoronoiMap )
     {
-      distanceIt.SetDirection(d);
-      distanceIt.GoToBegin();
-  
-      while (!distanceIt.IsAtEnd())
-      {
-        // Compute the generalized distance transform for the current scanline
-  
-        // First compute the lower envelope of parabolas
-        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
-        // dummy value of 1 anyway.
-        LEOPDv envelope(size[d], static_cast<TSpacingType>(spacing[d]));
-  
-        while (!distanceIt.IsAtEndOfLine())
-        {
-          typename LEOPDv::AbscissaIndexType i = distanceIt.GetIndex()[d];
-  
-          envelope.addParabola(i, distanceIt.Value());
-          ++distanceIt;
-        }
-  
-        // And now evaluate the lower envelope for the whole scanline
-        distanceIt.GoToBeginOfLine();
-  
-        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt);
-        distanceIt.NextLine();
-      }
+    TemplateGenerateData<false, false>();
     }
-    }
-
-
-  if( !m_UseSpacing && m_CreateVoronoiMap )
-    {
-    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
-    {
-      distanceIt.SetDirection(d);
-      distanceIt.GoToBegin();
-  
-      voronoiMapIt.SetDirection(d);
-      voronoiMapIt.GoToBegin();
-  
-      while (!distanceIt.IsAtEnd())
-      {
-        // Compute the generalized distance transform for the current scanline
-  
-        // First compute the lower envelope of parabolas
-        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
-        // dummy value of 1 anyway.
-        LEOPdV envelope(size[d], 1);
-  
-        while (!distanceIt.IsAtEndOfLine())
-        {
-          typename LEOPdV::AbscissaIndexType i = distanceIt.GetIndex()[d];
-  
-          envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
-          ++voronoiMapIt;
-          ++distanceIt;
-        }
-  
-        // And now evaluate the lower envelope for the whole scanline
-        distanceIt.GoToBeginOfLine();
-        voronoiMapIt.GoToBeginOfLine();
-  
-        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt, voronoiMapIt);
-        voronoiMapIt.NextLine();
-        distanceIt.NextLine();
-      }
-    }
-    }
-
-
-  if( !m_UseSpacing && !m_CreateVoronoiMap )
-    {
-    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
-    {
-      distanceIt.SetDirection(d);
-      distanceIt.GoToBegin();
-  
-      while (!distanceIt.IsAtEnd())
-      {
-        // Compute the generalized distance transform for the current scanline
-  
-        // First compute the lower envelope of parabolas
-        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
-        // dummy value of 1 anyway.
-        LEOPdv envelope(size[d], 1);
-  
-        while (!distanceIt.IsAtEndOfLine())
-        {
-          typename LEOPdv::AbscissaIndexType i = distanceIt.GetIndex()[d];
-  
-          envelope.addParabola(i, distanceIt.Value());
-          ++distanceIt;
-        }
-  
-        // And now evaluate the lower envelope for the whole scanline
-        distanceIt.GoToBeginOfLine();
-  
-        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt);
-        distanceIt.NextLine();
-      }
-    }
-    }
-
-
 } // end GenerateData()
 
 /**
