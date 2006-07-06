@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
+    threshold->SetOutsideValue(DTF::GetMaximumApexHeight());
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
+    threshold->SetOutsideValue(DTF::GetMaximumApexHeight());
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
+    threshold->SetOutsideValue(DTF::GetMaximumApexHeight());
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
+    threshold->SetOutsideValue(DTF::GetMaximumApexHeight());
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());

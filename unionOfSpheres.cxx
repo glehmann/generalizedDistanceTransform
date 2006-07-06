@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   typedef itk::Functor::AccessorFunctor<DistancePixelType, IndicatorAccessor> IndicatorFunctor;
   typedef itk::UnaryFunctorImageFilter<DistanceImageType, DistanceImageType, IndicatorFunctor> Indicator;
   Indicator::Pointer sampledFunction = Indicator::New();
-  sampledFunction->GetFunctor().GetAccessor().SetNotThereValue(GDT::LEOPUV::maxApexHeight);
+  sampledFunction->GetFunctor().GetAccessor().SetNotThereValue(GDT::GetMaximumApexHeight());
   sampledFunction->SetInput(negSquaredRadius->GetOutput());
 
   // Now all is set for the GeneralizedDistanceTransformImageFilter.

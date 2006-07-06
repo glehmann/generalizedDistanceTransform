@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   indicator->SetLowerThreshold(0);
   indicator->SetUpperThreshold(0);
   indicator->SetOutsideValue(0);
-  indicator->SetInsideValue(Distance::LEOPUV::maxApexHeight);
+  indicator->SetInsideValue(Distance::GetMaximumApexHeight());
   indicator->SetInput(input->GetOutput());
   indicator->Update();
   std::cout << "Indicator updated.\n";

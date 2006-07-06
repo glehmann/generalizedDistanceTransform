@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   indicator->SetLowerThreshold(0);
   indicator->SetUpperThreshold(0);
   indicator->SetOutsideValue(0);
-  indicator->SetInsideValue(Distance::LEOPUV::maxApexHeight);
+  indicator->SetInsideValue(Distance::GetMaximumApexHeight());
   indicator->SetInput(border->GetOutput());
 
   // Now the border image is fed into the distance transform...

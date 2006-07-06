@@ -125,20 +125,23 @@ public:
   typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, true,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TDistanceImage::PixelType> LEOPUV;
+          typename TDistanceImage::PixelType> LEOPDV;
   typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, false,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TDistanceImage::PixelType> LEOPUv;
+          typename TDistanceImage::PixelType> LEOPDv;
   typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, true,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TDistanceImage::PixelType> LEOPuV;
+          typename TDistanceImage::PixelType> LEOPdV;
   typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, false,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TDistanceImage::PixelType> LEOPuv;
+          typename TDistanceImage::PixelType> LEOPdv;
 
+  static typename TDistanceImage::PixelType GetMaximumApexHeight()
+    { return LEOPDV::maxApexHeight; } 
+   
   /** Connect the function image */
   void SetInput1(const FunctionImageType *functionImage);
 

@@ -248,11 +248,11 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
         // First compute the lower envelope of parabolas
         // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
         // dummy value of 1 anyway.
-        LEOPUV envelope(size[d], static_cast<TSpacingType>(spacing[d]));
+        LEOPDV envelope(size[d], static_cast<TSpacingType>(spacing[d]));
   
         while (!distanceIt.IsAtEndOfLine())
         {
-          typename LEOPUV::AbscissaIndexType i = distanceIt.GetIndex()[d];
+          typename LEOPDV::AbscissaIndexType i = distanceIt.GetIndex()[d];
   
           envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
           ++voronoiMapIt;
@@ -285,11 +285,11 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
         // First compute the lower envelope of parabolas
         // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
         // dummy value of 1 anyway.
-        LEOPUv envelope(size[d], static_cast<TSpacingType>(spacing[d]));
+        LEOPDv envelope(size[d], static_cast<TSpacingType>(spacing[d]));
   
         while (!distanceIt.IsAtEndOfLine())
         {
-          typename LEOPUv::AbscissaIndexType i = distanceIt.GetIndex()[d];
+          typename LEOPDv::AbscissaIndexType i = distanceIt.GetIndex()[d];
   
           envelope.addParabola(i, distanceIt.Value());
           ++distanceIt;
@@ -322,11 +322,11 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
         // First compute the lower envelope of parabolas
         // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
         // dummy value of 1 anyway.
-        LEOPuV envelope(size[d], 1);
+        LEOPdV envelope(size[d], 1);
   
         while (!distanceIt.IsAtEndOfLine())
         {
-          typename LEOPuV::AbscissaIndexType i = distanceIt.GetIndex()[d];
+          typename LEOPdV::AbscissaIndexType i = distanceIt.GetIndex()[d];
   
           envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
           ++voronoiMapIt;
@@ -359,11 +359,11 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
         // First compute the lower envelope of parabolas
         // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
         // dummy value of 1 anyway.
-        LEOPuv envelope(size[d], 1);
+        LEOPdv envelope(size[d], 1);
   
         while (!distanceIt.IsAtEndOfLine())
         {
-          typename LEOPuv::AbscissaIndexType i = distanceIt.GetIndex()[d];
+          typename LEOPdv::AbscissaIndexType i = distanceIt.GetIndex()[d];
   
           envelope.addParabola(i, distanceIt.Value());
           ++distanceIt;
