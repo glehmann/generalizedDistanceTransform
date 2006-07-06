@@ -85,9 +85,15 @@ ENDIF(BUILD_TESTING)
 #any tests you can comment out or delete the following line.
 # ADD_TEST(Testname ExecutableToRun arg1 arg2 arg3)
 
+ADD_TEST(EuclideanDistanceTransform euclideanDistanceTransform ${INPUT_IMAGE}/threeVoxels.label.img euclideanDistanceTransform.img)
+ADD_TEST(EuclideanDistanceTransformCompareImage ${IMAGE_COMPARE} euclideanDistanceTransform.img ${INPUT_IMAGE}/euclideanDistanceTransform.img)
+
 ADD_TEST(UnionOfSpheres unionOfSpheres ${INPUT_IMAGE}/threeVoxels.radius.img ${INPUT_IMAGE}/threeVoxels.label.img unionOfSpheres-union.img unionOfSpheres-voronoi.img)
-ADD_TEST(UnionOfSpheresCompareUnion ${IMAGE_COMPARE} unionOfSpheres-union.img ${CMAKE_SOURCE_DIR}/images/unionOfSpheres-union.img)
-ADD_TEST(UnionOfSpheresCompareVoronoi ${IMAGE_COMPARE} unionOfSpheres-voronoi.img ${CMAKE_SOURCE_DIR}/images/unionOfSpheres-voronoi.img)
+ADD_TEST(UnionOfSpheresCompareUnion ${IMAGE_COMPARE} unionOfSpheres-union.img ${INPUT_IMAGE}/unionOfSpheres-union.img)
+ADD_TEST(UnionOfSpheresCompareVoronoi ${IMAGE_COMPARE} unionOfSpheres-voronoi.img ${INPUT_IMAGE}/unionOfSpheres-voronoi.img)
+
+
+
 
 
 
