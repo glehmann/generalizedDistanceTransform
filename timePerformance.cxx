@@ -163,6 +163,7 @@ int main(int argc, char **argv)
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
+    distance->SetCreateVoronoiMap(false);
 
     img->Update();
     itk::TimeProbe timer;
@@ -194,6 +195,7 @@ int main(int argc, char **argv)
     distance->SetInput2(img->GetOutput());
     distance->SetUseSpacing(true);
     distance->SetCreateVoronoiMap(true);
+    distance->SetUseSpacing(false);
 
     img->Update();
     itk::TimeProbe timer;
@@ -224,6 +226,8 @@ int main(int argc, char **argv)
     distance->SetInput1(threshold->GetOutput());
     distance->SetUseSpacing(false);
     distance->SetCreateVoronoiMap(false);
+    distance->SetCreateVoronoiMap(false);
+    distance->SetUseSpacing(false);
 
     img->Update();
     itk::TimeProbe timer;
