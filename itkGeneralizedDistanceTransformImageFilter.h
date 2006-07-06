@@ -84,12 +84,8 @@ namespace itk
 */
 
 template <
-  class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap=true,
-  class TLabelImage=TFunctionImage,
-  bool UseSpacing=true,
-  class TSpacingType=typename TFunctionImage::SpacingType::ValueType,
-  unsigned char MinimalSpacingPrecision=3 >
+  class TFunctionImage,class TDistanceImage, class TLabelImage=TFunctionImage,
+        unsigned char MinimalSpacingPrecision=3 >
 class ITK_EXPORT GeneralizedDistanceTransformImageFilter :
     public ImageToImageFilter<TFunctionImage,TDistanceImage>
 {
@@ -114,6 +110,7 @@ public:
   typedef typename FunctionImageType::ConstPointer FunctionImageConstPointer;
   typedef typename DistanceImageType::Pointer DistanceImagePointer;
   typedef typename LabelImageType::Pointer LabelImagePointer;
+  typedef typename TFunctionImage::SpacingType::ValueType TSpacingType;
 
   /** The main work is done by a class that computes the lower envelope of
    * parabolas. It can be tuned for performance vs. functionality by providing
@@ -125,10 +122,22 @@ public:
    * should characterize background voxels.
    *
    * TODO: Avoid abbreviation */
-  typedef itk::LowerEnvelopeOfParabolas<UseSpacing, TSpacingType, MinimalSpacingPrecision,
-          CreateVoronoiMap, typename TLabelImage::PixelType,
+  typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, true,
+          typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TFunctionImage::PixelType> LEOP;
+          typename TFunctionImage::PixelType> LEOPUV;
+  typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, false,
+          typename TLabelImage::PixelType,
+          typename TFunctionImage::IndexValueType,
+          typename TFunctionImage::PixelType> LEOPUv;
+  typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, true,
+          typename TLabelImage::PixelType,
+          typename TFunctionImage::IndexValueType,
+          typename TFunctionImage::PixelType> LEOPuV;
+  typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, false,
+          typename TLabelImage::PixelType,
+          typename TFunctionImage::IndexValueType,
+          typename TFunctionImage::PixelType> LEOPuv;
 
   /** Connect the function image */
   void SetInput1(const FunctionImageType *functionImage);
@@ -152,6 +161,16 @@ public:
    * distance map. */
   LabelImageType* GetVoronoiMap(void);
 
+  /** Set/Get wether spacing should be used or not. */
+  itkGetMacro(UseSpacing, bool);
+  itkSetMacro(UseSpacing, bool);
+  itkBooleanMacro(UseSpacing);
+
+  /** Set/Get wether voronoi map should be created or not. */
+  itkGetMacro(CreateVoronoiMap, bool);
+  void SetCreateVoronoiMap(bool);
+  itkBooleanMacro(CreateVoronoiMap);
+
 
 protected:
   GeneralizedDistanceTransformImageFilter();
@@ -172,6 +191,9 @@ protected:
 private:   
   GeneralizedDistanceTransformImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
+
+  bool m_UseSpacing;
+  bool m_CreateVoronoiMap;
 
 }; // end of GeneralizedDistanceTransformImageFilter class
 

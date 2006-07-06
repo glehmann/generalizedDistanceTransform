@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOP::maxApexHeight);
+    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
   // GeneralizedDistanceTransformImageFilter with spacing, without Voronoi map
   {
-    typedef itk::GeneralizedDistanceTransformImageFilter<FunctionImage, FunctionImage, false> DTF;
+    typedef itk::GeneralizedDistanceTransformImageFilter<FunctionImage, FunctionImage> DTF;
 
     // Convert the label image into an indicator function
     // Of course, we include the computation of the indicator function
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOP::maxApexHeight);
+    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
   // GeneralizedDistanceTransformImageFilter without spacing, with Voronoi map
   {
     typedef itk::GeneralizedDistanceTransformImageFilter<FunctionImage,
-            FunctionImage, true, FunctionImage, false, FunctionImage::IndexValueType, 0> DTF;
+            FunctionImage, FunctionImage, 0> DTF;
 
     // Convert the label image into an indicator function
     // Of course, we include the computation of the indicator function
@@ -187,11 +187,13 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOP::maxApexHeight);
+    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
     distance->SetInput2(img->GetOutput());
+    distance->SetUseSpacing(true);
+    distance->SetCreateVoronoiMap(true);
 
     img->Update();
     itk::TimeProbe timer;
@@ -205,7 +207,7 @@ int main(int argc, char **argv)
   // GeneralizedDistanceTransformImageFilter without spacing, without Voronoi map
   {
     typedef itk::GeneralizedDistanceTransformImageFilter<FunctionImage,
-            FunctionImage, false, FunctionImage, false, FunctionImage::IndexValueType, 0> DTF;
+            FunctionImage, FunctionImage, 0> DTF;
 
     // Convert the label image into an indicator function
     // Of course, we include the computation of the indicator function
@@ -216,10 +218,12 @@ int main(int argc, char **argv)
     threshold->SetLowerThreshold(1);
     threshold->SetUpperThreshold(std::numeric_limits<FunctionImage::PixelType>::max());
     threshold->SetInsideValue(0);
-    threshold->SetOutsideValue(DTF::LEOP::maxApexHeight);
+    threshold->SetOutsideValue(DTF::LEOPUV::maxApexHeight);
     
     DTF::Pointer distance = DTF::New();
     distance->SetInput1(threshold->GetOutput());
+    distance->SetUseSpacing(false);
+    distance->SetCreateVoronoiMap(false);
 
     img->Update();
     itk::TimeProbe timer;

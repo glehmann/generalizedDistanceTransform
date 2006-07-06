@@ -15,15 +15,29 @@ namespace itk
 /**
  *    Constructor
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::GeneralizedDistanceTransformImageFilter()
 {
-  if (CreateVoronoiMap)
+  SetCreateVoronoiMap( true );
+  m_UseSpacing = true;
+
+  DistanceImagePointer distance = DistanceImageType::New();
+  this->SetNthOutput(0, distance.GetPointer());
+
+  LabelImagePointer voronoiMap = LabelImageType::New();
+  this->SetNthOutput(1, voronoiMap.GetPointer());
+
+}
+
+
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
+void
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
+::SetCreateVoronoiMap(bool b)
+{
+  m_CreateVoronoiMap = b;
+  if (m_CreateVoronoiMap)
   {
     this->SetNumberOfRequiredInputs(2);
     this->SetNumberOfRequiredOutputs(2);
@@ -33,27 +47,16 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
   }
-
-  DistanceImagePointer distance = DistanceImageType::New();
-  this->SetNthOutput(0, distance.GetPointer());
-
-  if (CreateVoronoiMap)
-  {
-    LabelImagePointer voronoiMap = LabelImageType::New();
-    this->SetNthOutput(1, voronoiMap.GetPointer());
-  }
 }
+
+
 
 /**
  * Connect the function image
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::SetInput1(const FunctionImageType *functionImage)
 {
   // Process object is not const-correct so the const casting is required.
@@ -63,13 +66,9 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
 /**
  * Connect the label image
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::SetInput2(const LabelImageType *labelImage)
 {
   // Process object is not const-correct so the const casting is required.
@@ -79,69 +78,49 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
 /**
  *  Return the distance map
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 typename
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::DistanceImageType*
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::GetDistance(void)
 {
   return  dynamic_cast<DistanceImageType *>(this->ProcessObject::GetOutput(0));
 }
 
 /**
- *  Return the voronoi map if CreateVoronoiMap == true
+ *  Return the voronoi map if m_CreateVoronoiMap == true
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 typename
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::LabelImageType*
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::GetVoronoiMap()
 {
-  assert(CreateVoronoiMap);
+  assert(m_CreateVoronoiMap);
   return  dynamic_cast<LabelImageType *>(this->ProcessObject::GetOutput(1));
 }
 
 /** 
  * The whole output will be produced regardless of the region requested.
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::EnlargeOutputRequestedRegion(DataObject *)
 {
   this->GetDistance()->SetRequestedRegion(this->GetDistance()->GetLargestPossibleRegion());
-  if (CreateVoronoiMap)
+  if (m_CreateVoronoiMap)
     this->GetVoronoiMap()->SetRequestedRegion(this->GetVoronoiMap()->GetLargestPossibleRegion());
 }
 
 /**
  * Allocate and initialize output images. Helper function for GenerateData()
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void 
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::PrepareData() 
 {
 
@@ -168,7 +147,7 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
     ++distanceIt;
   }
 
-  if (CreateVoronoiMap)
+  if (m_CreateVoronoiMap)
   {
     // Copy the label image into the voronoi map
     LabelImagePointer labelImage  =
@@ -199,15 +178,12 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
  *  Compute Distance and Voronoi maps
  *  \todo Support progress methods/callbacks.
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void 
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::GenerateData() 
 {
+
   this->PrepareData();
 
   // We need the size and probably the spacing of the images.
@@ -236,10 +212,10 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
   // disabled and should be optimized away.
   //
   // A cleaner solution would be specializations of GenerateData() on
-  // CreateVoronoiMap and UseSpacing.
+  // m_CreateVoronoiMap and m_UseSpacing.
   typedef itk::ImageLinearIteratorWithIndex<LabelImageType> LIt;
   LIt voronoiMapIt;
-  if (CreateVoronoiMap)
+  if (m_CreateVoronoiMap)
   {
     LabelImagePointer voronoiMap = 
       dynamic_cast<LabelImageType *>(this->ProcessObject::GetOutput(1));
@@ -255,78 +231,168 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage,
   // \todo non-local memory access for dimensions >= 1 can lead to ineffective
   // use of the cache. Another layout could improve performance.
 
-  for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
-  {
-    distanceIt.SetDirection(d);
-    distanceIt.GoToBegin();
-
-    if (CreateVoronoiMap)
+  if( m_UseSpacing && m_CreateVoronoiMap )
     {
+    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    {
+      distanceIt.SetDirection(d);
+      distanceIt.GoToBegin();
+  
       voronoiMapIt.SetDirection(d);
       voronoiMapIt.GoToBegin();
-    }
-
-    while (!distanceIt.IsAtEnd())
-    {
-      // Compute the generalized distance transform for the current scanline
-
-      // First compute the lower envelope of parabolas
-      // The spacing is ignored by LEOP if UseSpacing == false. We provide a
-      // dummy value of 1 anyway.
-      LEOP envelope(size[d], UseSpacing ? static_cast<TSpacingType>(spacing[d]) : 1);
-
-      while (!distanceIt.IsAtEndOfLine())
+  
+      while (!distanceIt.IsAtEnd())
       {
-        typename LEOP::AbscissaIndexType i = distanceIt.GetIndex()[d];
-
-        if (CreateVoronoiMap)
+        // Compute the generalized distance transform for the current scanline
+  
+        // First compute the lower envelope of parabolas
+        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
+        // dummy value of 1 anyway.
+        LEOPUV envelope(size[d], static_cast<TSpacingType>(spacing[d]));
+  
+        while (!distanceIt.IsAtEndOfLine())
         {
+          typename LEOPUV::AbscissaIndexType i = distanceIt.GetIndex()[d];
+  
           envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
           ++voronoiMapIt;
           ++distanceIt;
         }
-        else
-        {
-          envelope.addParabola(i, distanceIt.Value());
-          ++distanceIt;
-        }
-      }
-
-      // And now evaluate the lower envelope for the whole scanline
-      distanceIt.GoToBeginOfLine();
-      if (CreateVoronoiMap)
+  
+        // And now evaluate the lower envelope for the whole scanline
+        distanceIt.GoToBeginOfLine();
         voronoiMapIt.GoToBeginOfLine();
-
-      if (CreateVoronoiMap)
-      {
+  
         envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt, voronoiMapIt);
         voronoiMapIt.NextLine();
         distanceIt.NextLine();
       }
-      else
+    }
+    }
+
+
+  if( m_UseSpacing && !m_CreateVoronoiMap )
+    {
+    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    {
+      distanceIt.SetDirection(d);
+      distanceIt.GoToBegin();
+  
+      while (!distanceIt.IsAtEnd())
       {
+        // Compute the generalized distance transform for the current scanline
+  
+        // First compute the lower envelope of parabolas
+        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
+        // dummy value of 1 anyway.
+        LEOPUv envelope(size[d], static_cast<TSpacingType>(spacing[d]));
+  
+        while (!distanceIt.IsAtEndOfLine())
+        {
+          typename LEOPUv::AbscissaIndexType i = distanceIt.GetIndex()[d];
+  
+          envelope.addParabola(i, distanceIt.Value());
+          ++distanceIt;
+        }
+  
+        // And now evaluate the lower envelope for the whole scanline
+        distanceIt.GoToBeginOfLine();
+  
         envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt);
         distanceIt.NextLine();
       }
     }
-  }
+    }
+
+
+  if( !m_UseSpacing && m_CreateVoronoiMap )
+    {
+    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    {
+      distanceIt.SetDirection(d);
+      distanceIt.GoToBegin();
+  
+      voronoiMapIt.SetDirection(d);
+      voronoiMapIt.GoToBegin();
+  
+      while (!distanceIt.IsAtEnd())
+      {
+        // Compute the generalized distance transform for the current scanline
+  
+        // First compute the lower envelope of parabolas
+        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
+        // dummy value of 1 anyway.
+        LEOPuV envelope(size[d], 1);
+  
+        while (!distanceIt.IsAtEndOfLine())
+        {
+          typename LEOPuV::AbscissaIndexType i = distanceIt.GetIndex()[d];
+  
+          envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
+          ++voronoiMapIt;
+          ++distanceIt;
+        }
+  
+        // And now evaluate the lower envelope for the whole scanline
+        distanceIt.GoToBeginOfLine();
+        voronoiMapIt.GoToBeginOfLine();
+  
+        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt, voronoiMapIt);
+        voronoiMapIt.NextLine();
+        distanceIt.NextLine();
+      }
+    }
+    }
+
+
+  if( !m_UseSpacing && !m_CreateVoronoiMap )
+    {
+    for (unsigned int d = 0; d < FunctionImageType::ImageDimension; ++d)
+    {
+      distanceIt.SetDirection(d);
+      distanceIt.GoToBegin();
+  
+      while (!distanceIt.IsAtEnd())
+      {
+        // Compute the generalized distance transform for the current scanline
+  
+        // First compute the lower envelope of parabolas
+        // The spacing is ignored by LEOP if m_UseSpacing == false. We provide a
+        // dummy value of 1 anyway.
+        LEOPuv envelope(size[d], 1);
+  
+        while (!distanceIt.IsAtEndOfLine())
+        {
+          typename LEOPuv::AbscissaIndexType i = distanceIt.GetIndex()[d];
+  
+          envelope.addParabola(i, distanceIt.Value());
+          ++distanceIt;
+        }
+  
+        // And now evaluate the lower envelope for the whole scanline
+        distanceIt.GoToBeginOfLine();
+  
+        envelope.uniformSample(distanceIt.GetIndex()[d], size[d], distanceIt);
+        distanceIt.NextLine();
+      }
+    }
+    }
+
+
 } // end GenerateData()
 
 /**
  *  Print Self
  *  \todo Add information on the constraints on abscissas and apex heights.
  */
-template < class TFunctionImage,class TDistanceImage,
-  bool CreateVoronoiMap, class TLabelImage,
-  bool UseSpacing, class TSpacingType, unsigned char MinimalSpacingPrecision >
+template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void 
-GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, 
-  CreateVoronoiMap, TLabelImage,
-  UseSpacing, TSpacingType, MinimalSpacingPrecision >
+GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelImage, MinimalSpacingPrecision >
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
-  os << indent << "Generalized Distance Transform: " << std::endl;
+  os << indent << "UseSpacing: " << m_UseSpacing << std::endl;
+  os << indent << "CreateVoronoiMap: " << m_CreateVoronoiMap << std::endl;
 }
 } // end namespace itk
 #endif

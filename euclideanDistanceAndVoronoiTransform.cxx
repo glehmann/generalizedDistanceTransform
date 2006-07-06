@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   indicator->SetLowerThreshold(0);
   indicator->SetUpperThreshold(0);
   indicator->SetOutsideValue(0);
-  indicator->SetInsideValue(Distance::LEOP::maxApexHeight);
+  indicator->SetInsideValue(Distance::LEOPUV::maxApexHeight);
   indicator->SetInput(input->GetOutput());
 
   // Now the indicator and label images are fed into the distance transform...

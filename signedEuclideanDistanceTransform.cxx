@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   border->SetInput2(erode->GetOutput());
 
   // We are using the distance transform without Voronoi map generation
-  typedef itk::GeneralizedDistanceTransformImageFilter<ImageType, ImageType, false> Distance;
+  typedef itk::GeneralizedDistanceTransformImageFilter<ImageType, ImageType> Distance;
 
   // For the border image l, create an indicator image i with 
   // i(x) = (l(x) == 0 ?  infinity : 0).
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   indicator->SetLowerThreshold(0);
   indicator->SetUpperThreshold(0);
   indicator->SetOutsideValue(0);
-  indicator->SetInsideValue(Distance::LEOP::maxApexHeight);
+  indicator->SetInsideValue(Distance::LEOPUV::maxApexHeight);
   indicator->SetInput(border->GetOutput());
 
   // Now the border image is fed into the distance transform...

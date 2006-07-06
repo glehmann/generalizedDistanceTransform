@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   // The default for GeneralizedDistanceTransformImageFilter is to compute a
   // Voronoi map that has the same type as the distance image.
   typedef itk::GeneralizedDistanceTransformImageFilter<ImageType, ImageType,
-          true, VectorImageType> Distance;
+          VectorImageType> Distance;
 
   // For the label image l, create an indicator image i with 
   // i(x) = (l(x) == 0 ?  infinity : 0).
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   indicator->SetLowerThreshold(0);
   indicator->SetUpperThreshold(0);
   indicator->SetOutsideValue(0);
-  indicator->SetInsideValue(Distance::LEOP::maxApexHeight);
+  indicator->SetInsideValue(Distance::LEOPUV::maxApexHeight);
   indicator->SetInput(input->GetOutput());
   indicator->Update();
   std::cout << "Indicator updated.\n";

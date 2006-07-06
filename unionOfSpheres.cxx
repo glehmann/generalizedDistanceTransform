@@ -54,12 +54,12 @@ int main(int argc, char *argv[])
   // We further have to indicate the background voxels.  We get the background
   // indicator value from GeneralizedDistanceTransformImageFilter's instance
   // of itk::LowerEnvelopeOfParabolas
-  typedef itk::GeneralizedDistanceTransformImageFilter<DistanceImageType, DistanceImageType,true, LabelImageType> GDT;
+  typedef itk::GeneralizedDistanceTransformImageFilter<DistanceImageType, DistanceImageType, LabelImageType> GDT;
   typedef itk::Accessor::IndicatorAccessor<DistancePixelType, DistancePixelType> IndicatorAccessor;
   typedef itk::Functor::AccessorFunctor<DistancePixelType, IndicatorAccessor> IndicatorFunctor;
   typedef itk::UnaryFunctorImageFilter<DistanceImageType, DistanceImageType, IndicatorFunctor> Indicator;
   Indicator::Pointer sampledFunction = Indicator::New();
-  sampledFunction->GetFunctor().GetAccessor().SetNotThereValue(GDT::LEOP::maxApexHeight);
+  sampledFunction->GetFunctor().GetAccessor().SetNotThereValue(GDT::LEOPUV::maxApexHeight);
   sampledFunction->SetInput(negSquaredRadius->GetOutput());
 
   // Now all is set for the GeneralizedDistanceTransformImageFilter.
