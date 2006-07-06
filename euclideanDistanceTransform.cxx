@@ -4,6 +4,8 @@
 #include "itkSqrtImageFilter.h"
 #include "itkImageFileWriter.h"
 
+#include "itkSimpleFilterWatcher.h"
+
 int main(int argc, char *argv[])
 {
   if (argc != 3)
@@ -45,6 +47,8 @@ int main(int argc, char *argv[])
   Distance::Pointer distance = Distance::New();
   distance->SetInput1(indicator->GetOutput());
   distance->SetCreateVoronoiMap(false);
+
+  itk::SimpleFilterWatcher watcher(distance, "filter");
 
   // ...and converted from the squared euclidean distance to the regular
   // euclidean distance

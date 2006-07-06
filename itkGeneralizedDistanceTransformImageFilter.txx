@@ -7,6 +7,7 @@
 #include "itkImageLinearIteratorWithIndex.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIterator.h"
+#include "itkProgressReporter.h"
 
 namespace itk
 {
@@ -173,6 +174,11 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
   }
 }
 
+
+/**
+ *  Compute Distance and Voronoi maps
+ *  \todo Support progress methods/callbacks.
+ */
 template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 template <bool UseSpacing, bool CreateVoronoiMap >
 void 
@@ -222,6 +228,9 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
     voronoiMapIt = LIt(voronoiMap, voronoiMap->GetRequestedRegion());
   }
 
+  // set up the progress reporter
+  ProgressReporter progress(this, 0, distance->GetRequestedRegion().GetNumberOfPixels() * FunctionImageType::ImageDimension);
+
   // Loop over all dimensions and compute the generalized distance transform
   // and voronoi map for each scanline.
   //
@@ -260,11 +269,13 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
           envelope.addParabola(i, distanceIt.Value(), voronoiMapIt.Value());
           ++voronoiMapIt;
           ++distanceIt;
+          progress.CompletedPixel();
         }
         else
         {
           envelope.addParabola(i, distanceIt.Value());
           ++distanceIt;
+          progress.CompletedPixel();
         }
       }
 
@@ -288,9 +299,10 @@ GeneralizedDistanceTransformImageFilter< TFunctionImage, TDistanceImage, TLabelI
   }
 }
 
+
 /**
- *  Compute Distance and Voronoi maps
- *  \todo Support progress methods/callbacks.
+ * Dispatch the execution to the correct specialized TemplateGenerateData()
+ * method
  */
 template < class TFunctionImage,class TDistanceImage, class TLabelImage, unsigned char MinimalSpacingPrecision >
 void 
