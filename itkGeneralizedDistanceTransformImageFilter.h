@@ -125,19 +125,19 @@ public:
   typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, true,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TFunctionImage::PixelType> LEOPUV;
+          typename TDistanceImage::PixelType> LEOPUV;
   typedef itk::LowerEnvelopeOfParabolas<true, TSpacingType, MinimalSpacingPrecision, false,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TFunctionImage::PixelType> LEOPUv;
+          typename TDistanceImage::PixelType> LEOPUv;
   typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, true,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TFunctionImage::PixelType> LEOPuV;
+          typename TDistanceImage::PixelType> LEOPuV;
   typedef itk::LowerEnvelopeOfParabolas<false, TSpacingType, MinimalSpacingPrecision, false,
           typename TLabelImage::PixelType,
           typename TFunctionImage::IndexValueType,
-          typename TFunctionImage::PixelType> LEOPuv;
+          typename TDistanceImage::PixelType> LEOPuv;
 
   /** Connect the function image */
   void SetInput1(const FunctionImageType *functionImage);
